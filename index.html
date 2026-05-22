@@ -1,551 +1,176 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Personal Bento Site</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cylian</title>
+  <link rel="icon" type="image/webp" href="icons/favicon.webp?v=2" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0b0b;
-      --surface: #121212;
-      --ink: #f2f2f2;
-      --muted: #a0a0a0;
-      --accent: #ffffff;
-      --ring: #2a2a2a;
-      --timeline-axis: 7px;
-      --timeline-dot-size: 8px;
+      --bg: #111111;
+      --card: #1a1a1a;
+      --text: #f5f5f5;
+      --muted: #b3b3b3;
+      --border: #343434;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; }
 
-    html {
-      background: var(--bg);
-      scrollbar-width: none;
+    html, body {
+      height: 100%;
     }
 
     body {
-      font-family: "Inter", "Segoe UI", sans-serif;
+      margin: 0;
+      min-height: 100dvh;
+      font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
       background: var(--bg);
-      color: var(--ink);
-      line-height: 1.5;
-      min-height: 100vh;
-      padding: 2rem 1rem 3rem;
-      scrollbar-width: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
     }
 
-    body::-webkit-scrollbar,
-    html::-webkit-scrollbar {
-      width: 0;
-      height: 0;
-    }
-
-    .scroll-hint {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 36px;
-      pointer-events: none;
-      opacity: 0;
-      background: transparent;
-      z-index: 30;
-    }
-
-    .scroll-hint.show {
-      opacity: 1;
-    }
-
-    .wrap {
-      max-width: 1050px;
+    .card {
+      width: min(420px, 100%);
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 22px;
+      padding: 28px;
+      text-align: center;
       margin: 0 auto;
     }
 
-    h1, h2, h3 {
-      line-height: 1.15;
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      line-height: 1;
+      letter-spacing: 0.2px;
+      font-weight: 500;
     }
 
-    .title {
-      font-size: clamp(2.3rem, 5vw, 4rem);
-      margin-bottom: 0.75rem;
-      letter-spacing: 0.4px;
-      font-weight: 800;
-    }
-
-    .meta-row {
+    .name-row {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
     }
 
-    .status,
-    .local-time {
+    .status-pill {
+      height: 20px;
+      width: 20px;
+      border-radius: 999px;
+      background: #1f1f1f;
+      border: 1px solid #2b2b2b;
       display: inline-flex;
       align-items: center;
-      font-size: 0.85rem;
-      line-height: 1;
-      color: var(--muted);
-      border: 1px solid var(--ring);
-      border-radius: 10px;
-      padding: 0.25rem 0.6rem;
-      min-height: 32px;
-      background: var(--surface);
-    }
-
-    .status {
-      gap: 0.45rem;
+      justify-content: center;
+      padding: 0;
+      position: relative;
+      top: 1px;
     }
 
     .status-dot {
       width: 8px;
       height: 8px;
-      border-radius: 10px;
-      background: #888;
-    }
-
-    .status.online .status-dot {
-      background: #eaeaea;
-    }
-
-    .status.offline .status-dot {
-      background: #666;
-    }
-
-    .bento {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 0.9rem;
-    }
-
-    @media (min-width: 1200px) {
-      body {
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 2rem;
-      }
-
-      .wrap {
-        width: min(980px, 100%);
-        margin: 0;
-      }
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--ring);
-      border-radius: 10px;
-      padding: 1rem;
-    }
-
-    .hero {
-      grid-column: span 12;
-      display: flex;
-      flex-direction: column;
-      gap: 0.7rem;
-    }
-
-    .hero p {
-      color: var(--muted);
-      max-width: 58ch;
-    }
-
-    .timeline {
-      grid-column: span 12;
-    }
-
-    .skills {
-      grid-column: span 6;
-    }
-
-    .contact {
-      grid-column: span 6;
-    }
-
-    .services {
-      grid-column: span 12;
-    }
-
-    .notes {
-      grid-column: span 12;
-    }
-
-    .chip-row {
-      margin-top: 0.8rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .chip {
-      background: #1a1a1a;
-      border: 1px solid #303030;
-      border-radius: 10px;
-      padding: 0.3rem 0.65rem;
-      font-size: 0.86rem;
-      color: #d0d0d0;
-    }
-
-    ul {
-      margin-top: 0.75rem;
-      padding-left: 1rem;
-      color: var(--muted);
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration-thickness: 1.5px;
-    }
-
-    .muted {
-      color: var(--muted);
-      margin-top: 0.7rem;
-    }
-
-    .timeline-scroll {
-      max-height: 260px;
-      overflow-y: auto;
-      padding-right: 0.35rem;
-      scrollbar-width: thin;
-      scrollbar-color: #303030 transparent;
-    }
-
-    .timeline-scroll::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .timeline-scroll::-webkit-scrollbar-thumb {
-      background: #303030;
-      border-radius: 999px;
-    }
-
-    .timeline-list {
-      list-style: none;
-      margin-top: 0.8rem;
-      padding-left: 14px;
-      padding-bottom: 0.35rem;
-      position: relative;
-    }
-
-    .timeline-list::before {
-      content: "";
-      position: absolute;
-      left: var(--timeline-axis);
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      background: var(--ring);
-    }
-
-    .timeline-item {
-      position: relative;
-      list-style: none;
-      padding-left: 18px;
-      margin-left: 0;
-      margin-bottom: 1rem;
-    }
-
-    .timeline-item::marker {
-      content: "";
-    }
-
-    .timeline-item:last-child {
-      margin-bottom: 0;
-    }
-
-    .timeline-item::before {
-      content: "";
-      position: absolute;
-      left: calc(var(--timeline-axis) - (var(--timeline-dot-size) / 2));
-      top: 0.35rem;
-      width: var(--timeline-dot-size);
-      height: var(--timeline-dot-size);
       border-radius: 50%;
-      background: #d8d8d8;
+      background: #9a9a9a;
+      display: block;
     }
 
-    .timeline-date {
-      color: #c6c6c6;
-      font-size: 0.8rem;
-      letter-spacing: 0.02em;
-      margin-bottom: 0.15rem;
-    }
-
-    .timeline-role {
-      font-weight: 700;
-      margin-bottom: 0.2rem;
-    }
-
-    .timeline-desc {
+    .meta {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
       color: var(--muted);
+      font-size: 0.82rem;
     }
 
-    .service-grid {
-      margin-top: 0.8rem;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.7rem;
+    .email a {
+      color: var(--text);
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
 
-    .service-item {
-      border: 1px solid var(--ring);
-      border-radius: 8px;
-      padding: 0.8rem;
-      background: #151515;
-    }
-
-    .service-item h4 {
-      font-size: 0.95rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .service-item p {
+    .local-time {
       color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    @media (max-width: 900px) {
-      body {
-        padding: 1.6rem 0.8rem 1.4rem;
-      }
-
-      .title {
-        font-size: clamp(2.8rem, 14vw, 4.2rem);
-        margin-bottom: 0.9rem;
-      }
-
-      .bento {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.7rem;
-      }
-
-      .card {
-        border-radius: 10px;
-        padding: 0.9rem;
-      }
-
-      .hero,
-      .timeline {
-        grid-column: span 2;
-      }
-
-      .skills,
-      .contact {
-        grid-column: span 1;
-      }
-
-      .services,
-      .notes {
-        grid-column: span 2;
-      }
-
-      .service-grid {
-        grid-template-columns: 1fr;
-      }
     }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <h1 class="title">Cylian</h1>
-    <div class="meta-row">
-      <p class="status" id="netStatus" aria-live="polite">
-        <span class="status-dot" aria-hidden="true"></span>
-        <span id="netStatusText">Checking connection...</span>
-      </p>
-      <p class="local-time" id="localTime">Local time: --:--</p>
+  <main class="card">
+    <div class="name-row">
+      <h1>Cylian</h1>
+      <span class="status-pill" id="statusPill" aria-label="Discord status">
+        <span class="status-dot" id="statusDot"></span>
+      </span>
     </div>
 
-    <section class="bento">
-      <article class="card hero">
-        <h2>Personal Website</h2>
-        <p>
-          I create clean digital products with strong storytelling, thoughtful UX, and maintainable code.
-          This bento layout gives a quick snapshot of my work, skills, and what I care about.
-        </p>
-        <div class="chip-row">
-          <span class="chip">Based in Paris</span>
-          <span class="chip">Open to freelance</span>
-          <span class="chip">Remote-friendly</span>
-        </div>
-      </article>
+    <div class="meta">
+      <span class="email"><a href="mailto:hi@cylian.nl">hi@cylian.nl</a></span>
+      <span>•</span>
+      <span class="local-time" id="localTime">UTC+2 --:--:--</span>
+    </div>
 
-      <article class="card timeline">
-        <h3>Experience Timeline</h3>
-        <div class="timeline-scroll">
-          <ul class="timeline-list">
-          <li class="timeline-item">
-              <p class="timeline-date">November 2025 · Internship</p>
-            <p class="timeline-role">ENRENFORT - IT Department | AI & Software Development | Paris</p>
-            <p class="timeline-desc">Trained in AI tools and actively contributed to the development of an AI project intended for production deployment.</p>
-            <p class="timeline-desc">Conducted a comparative study of generative AI solutions best suited for media workflows, and created AI-generated content as part of a fundraising initiative.</p>
-            <p class="timeline-desc">Contributed to web development (Vite / Vue 3), hardware maintenance, and setup of development workstations, while supporting technical assistance tasks and video editing in DaVinci Resolve.</p>
-          </li>
-          <li class="timeline-item">
-              <p class="timeline-date">June 2025 · Internship</p>
-            <p class="timeline-role">XAN IT - IT Department | Quantum Computer | Basel, Switzerland</p>
-            <p class="timeline-desc">Contributed to maintenance of the IT infrastructure at the Basel Quantum Campus.</p>
-            <p class="timeline-desc">Installed and maintained servers, telephony systems, and workstations. Assembled computers and managed hardware purchasing.</p>
-            <p class="timeline-desc">Deployed Docker containers with clusters and wrote technical documentation, while gaining immersion in an innovative environment focused on quantum technologies.</p>
-          </li>
-          <li class="timeline-item">
-              <p class="timeline-date">December 2024 · Internship</p>
-            <p class="timeline-role">CFTC - IT Department, Headquarters | Paris</p>
-            <p class="timeline-desc">Contributed to web development (back-end) projects and IT support operations.</p>
-            <p class="timeline-desc">Built dynamic PHP forms, including one with address autocomplete using the French National Address Database (BAN) API, integrated into the company membership form. Developed business cards with QR codes, and modernized the internal directory with production-deployed changes.</p>
-            <p class="timeline-desc">Strengthened skills in PHP, APIs, databases, and end-user support.</p>
-          </li>
-          <li class="timeline-item">
-              <p class="timeline-date">December 2023 · Internship</p>
-            <p class="timeline-role">Rothschild &amp; Co</p>
-            <p class="timeline-desc">Internal Audit, FinTech, Private Banking, Finance | Paris</p>
-            <p class="timeline-desc">Exposure to various roles within Rothschild &amp; Co, mainly in internal audit alongside audit directors across different business lines, as well as with teams in Private Banking and Wealth Engineering, and within the FinTech department working with a Product Owner.</p>
-          </li>
-          </ul>
-        </div>
-      </article>
-
-      <article class="card skills">
-        <h3>Stack</h3>
-        <div class="chip-row">
-          <span class="chip">HTML</span>
-          <span class="chip">CSS</span>
-          <span class="chip">JavaScript</span>
-          <span class="chip">TypeScript</span>
-          <span class="chip">React</span>
-          <span class="chip">Node.js</span>
-          <span class="chip">Figma</span>
-        </div>
-      </article>
-
-      <article class="card contact">
-        <h3>Contact</h3>
-        <p class="muted">Let's build something meaningful.</p>
-        <ul>
-          <li>Email: <a href="mailto:alex@example.com">alex@example.com</a></li>
-          <li>GitHub: <a href="#">github.com/alex</a></li>
-          <li>LinkedIn: <a href="#">linkedin.com/in/alex</a></li>
-        </ul>
-      </article>
-
-      <article class="card services">
-        <h3>What I Do</h3>
-        <div class="service-grid">
-          <div class="service-item">
-            <h4>Brand Sites</h4>
-            <p>Personal and product websites with a clear voice and strong visual hierarchy.</p>
-          </div>
-          <div class="service-item">
-            <h4>Frontend Build</h4>
-            <p>Fast, responsive interfaces with accessible structure and clean implementation.</p>
-          </div>
-          <div class="service-item">
-            <h4>UI Systems</h4>
-            <p>Reusable UI patterns, tokens, and components that stay consistent over time.</p>
-          </div>
-        </div>
-      </article>
-
-      <article class="card notes">
-        <h3>More About My Work</h3>
-        <ul>
-          <li>I focus on simplicity first, then add detail where it genuinely improves usability.</li>
-          <li>I prefer small, maintainable systems over overly complex stacks.</li>
-          <li>I collaborate asynchronously and document decisions clearly for smooth handoff.</li>
-          <li>I care about performance, accessibility, and thoughtful micro-copy in interfaces.</li>
-          <li>Currently exploring interaction design patterns for portfolio and media-heavy pages.</li>
-        </ul>
-      </article>
-    </section>
   </main>
-
-  <div class="scroll-hint" id="scrollHint" aria-hidden="true"></div>
-
   <script>
-    (function () {
-      var hint = document.getElementById("scrollHint");
-      if (!hint) return;
+    const USER_ID = "830200981366112287";
+    const API_URL = `https://api.lanyard.rest/v1/users/${USER_ID}`;
 
-      function updateScrollHint() {
-        var doc = document.documentElement;
-        var maxScrollTop = doc.scrollHeight - window.innerHeight;
-        if (maxScrollTop <= 2) {
-          hint.classList.remove("show");
-          return;
-        }
+    async function updateStatus() {
+      const pill = document.getElementById("statusPill");
+      const dot = document.getElementById("statusDot");
+      if (!pill || !dot) return;
 
-        var remaining = maxScrollTop - window.scrollY;
-        if (remaining > 8) {
-          hint.classList.add("show");
+      try {
+        const res = await fetch(API_URL, { cache: "no-store" });
+        const json = await res.json();
+        const status = json?.data?.discord_status;
+        const isOnline = status === "online" || status === "dnd" || status === "idle";
+
+        if (isOnline) {
+          pill.style.background = "#1f1f1f";
+          pill.style.borderColor = "#2b2b2b";
+          dot.style.background = "#30d158";
         } else {
-          hint.classList.remove("show");
+          pill.style.background = "#1f1f1f";
+          pill.style.borderColor = "#2b2b2b";
+          dot.style.background = "#9a9a9a";
         }
+      } catch (_) {
+        pill.style.background = "#1f1f1f";
+        pill.style.borderColor = "#2b2b2b";
+        dot.style.background = "#9a9a9a";
       }
+    }
 
-      window.addEventListener("scroll", updateScrollHint, { passive: true });
-      window.addEventListener("resize", updateScrollHint);
-      window.addEventListener("load", updateScrollHint);
-      updateScrollHint();
-    })();
+    updateStatus();
+    setInterval(updateStatus, 30000);
 
-    (function () {
-      var status = document.getElementById("netStatus");
-      var text = document.getElementById("netStatusText");
-      var userId = "830200981366112287";
-      var endpoint = "https://api.lanyard.rest/v1/users/" + userId;
-      if (!status || !text) return;
+    function formatUtcPlus2Time() {
+      const now = new Date();
+      const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+      const utcPlus2 = new Date(utcMs + 2 * 60 * 60000);
+      const hh = String(utcPlus2.getHours()).padStart(2, "0");
+      const mm = String(utcPlus2.getMinutes()).padStart(2, "0");
+      const ss = String(utcPlus2.getSeconds()).padStart(2, "0");
+      return `${hh}:${mm}:${ss}`;
+    }
 
-      function setStatusLabel(isOnline) {
-        status.classList.toggle("online", isOnline);
-        status.classList.toggle("offline", !isOnline);
-        text.textContent = isOnline ? "Online" : "Offline";
-      }
+    function updateLocalTime() {
+      const el = document.getElementById("localTime");
+      if (!el) return;
+      el.textContent = `UTC+2 ${formatUtcPlus2Time()}`;
+    }
 
-      function mapDiscordStatus(discordStatus) {
-        return discordStatus === "online" || discordStatus === "dnd" || discordStatus === "idle";
-      }
-
-      async function refreshLanyardStatus() {
-        try {
-          var response = await fetch(endpoint, { cache: "no-store" });
-          if (!response.ok) throw new Error("Lanyard request failed");
-
-          var payload = await response.json();
-          if (!payload || !payload.success || !payload.data) throw new Error("Bad Lanyard payload");
-
-          var isOnline = mapDiscordStatus(payload.data.discord_status);
-          setStatusLabel(isOnline);
-        } catch (error) {
-          setStatusLabel(false);
-        }
-      }
-
-      refreshLanyardStatus();
-      setInterval(refreshLanyardStatus, 30000);
-    })();
-
-    (function () {
-      var localTime = document.getElementById("localTime");
-      if (!localTime) return;
-
-      function updateLocalTime() {
-        var now = new Date();
-        var time = now.toLocaleTimeString("en-GB", {
-          timeZone: "Europe/Paris",
-          hour: "2-digit",
-          minute: "2-digit"
-        });
-        localTime.textContent = "Local time: " + time;
-      }
-
-      updateLocalTime();
-      setInterval(updateLocalTime, 30000);
-    })();
+    updateLocalTime();
+    setInterval(updateLocalTime, 1000);
   </script>
 </body>
 </html>
